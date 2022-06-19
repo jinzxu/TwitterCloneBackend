@@ -29,11 +29,7 @@ const userSchema = new Schema({
     password: {
         type: String,
         reqruied: true
-    },
-    profilePic: {
-        type: String,
-        default: "/images/profilePic.jpeg"
-    },
+    }
 }, { timestamps: true })
 var User = mongoose.model("User", userSchema);
 module.exports = User;

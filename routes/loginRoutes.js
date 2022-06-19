@@ -5,14 +5,13 @@ const auth = require("../middleware/auth")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const config = require("config");
-router.get("/", (req, res) => {
-    res.status(200).json("login");
-})
+
 // Get a user by token
 router.get('/', auth, async (req, res) => {
     try {
+
         const user = await User.findById(req.user.id).select('-password');
-        res.json(user);
+        res.status(200).json(user);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -35,7 +34,6 @@ router.post("/", async (req, res) => {
             if (user != null) {
                 var result = await bcrypt.compare(logPassword, user.password);
                 if (result === true) {
-                    // console.log(user)
                     // Return jsonwebtoken
                     const payload = {
                         user: {

@@ -8,4 +8,5 @@ app.get("/", (req, res) => res.send("API Running"));
 app.use("/register", require("./routes/registerRoutes"));
 app.use("/login", require("./routes/loginRoutes"));
 app.use("/tweet", require("./routes/tweetRoutes"));
+app.use("/chat", require("./routes/chatRoutes"));
 module.exports = app;
