@@ -46,10 +46,8 @@ router.get("/", auth, async (req, res) => {
     try {
         Chat.find({ users: { $elemMatch: { $eq: req.user.id } } })
             .populate("users")
-            .populate("latestMessage")
             .sort({ updatedAt: -1 })
-            .then(async results => {
-                results = await User.populate(results, { path: "latestMessage.sender" });
+            .then(results => {
                 res.status(200).send(results)
             })
             .catch(error => {
@@ -64,15 +62,22 @@ router.get("/", auth, async (req, res) => {
 // Get group chat by chatid
 router.get("/:chatId", auth, async (req, res) => {
     try {
-        Chat.findOne({ _id: req.params.chatId, users: { $elemMatch: { $eq: req.user.id } } })
-            .populate("users")
-            .then(results => {
-                res.status(200).send(results)
-            })
-            .catch(error => {
-                console.log(error);
-                res.status(400).json(errors);
-            })
+        var chat = await Chat.findOne({ _id: req.params.chatId, users: { $elemMatch: { $eq: req.user.id } } })
+            .populate("users");
+        if (chat == null) {
+            return res.status(400).json("Chat does not exist or the user is not authorized to read the message in this chat.");
+        } else {
+            Chat.findOne({ _id: req.params.chatId, users: { $elemMatch: { $eq: req.user.id } } })
+                .populate("users")
+                .then(results => {
+                    res.status(200).send(results)
+                })
+                .catch(error => {
+                    console.log(error);
+                    res.status(400).json(errors);
+                })
+        }
+
     } catch (err) {
         console.log(err.message)
         res.status(500).send("Server error")
@@ -82,6 +87,10 @@ router.get("/:chatId", auth, async (req, res) => {
 // Create Message
 router.post("/:chatId/messages", auth, async (req, res) => {
     try {
+
+        if (req.body.content.trim() == "") {
+            return res.status(400).json("Empty message is not allowed");
+        }
         var chat = await Chat.findOne({ _id: req.body.chatId, users: { $elemMatch: { $eq: req.user.id } } })
             .populate("users");
         if (chat == null) {

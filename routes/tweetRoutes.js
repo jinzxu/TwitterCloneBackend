@@ -39,11 +39,11 @@ router.post("/", [auth,
         const user = await User.findById(req.user.id).select("-password");
         var tweetData = {
             content: req.body.content,
-            postedBy: user
+            tweetedBy: user
         }
         Tweet.create(tweetData)
             .then(async newTweet => {
-                newTweet = await User.populate(newTweet, { path: "postedBy" })
+                newTweet = await User.populate(newTweet, { path: "tweetedBy" })
                 res.status(200).json(newTweet);
             })
     } catch (err) {
@@ -62,7 +62,7 @@ router.put("/:id", auth, async (req, res) => {
             return res.status(404).json({ msg: "Tweet not found" })
         }
         //Check user
-        if (post.postedBy.toString() !== req.user.id) {
+        if (post.tweetedBy.toString() !== req.user.id) {
             return res.status(401).json({ msg: "User not authorized" });
         }
         await post.save();
@@ -82,7 +82,7 @@ router.delete("/:id", auth, async (req, res) => {
             return res.status(404).json({ msg: "Tweet not found" })
         }
         //Check user
-        if (post.postedBy.toString() !== req.user.id) {
+        if (post.tweetedBy.toString() !== req.user.id) {
             return res.status(401).json({ msg: "User not authorized" });
         }
         await post.remove();
