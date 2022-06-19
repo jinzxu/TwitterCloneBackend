@@ -27,7 +27,7 @@ router.get("/", auth, async (req, res) => {
     }
 });
 
-// Create a post
+// Create a tweet
 router.post("/", [auth,
     check("content", "Content is required").not().isEmpty()
 ], async (req, res) => {
@@ -52,41 +52,79 @@ router.post("/", [auth,
     }
 })
 
-// Update a post
+// Update a tweet
 router.put("/:id", auth, async (req, res) => {
     try {
-        const post = await Tweet.findById(req.params.id)
-        post.content = req.body.content
+        const updatedTweet = await Tweet.findById(req.params.id)
+        updatedTweet.content = req.body.content
         //Check post
-        if (!post) {
+        if (!updatedTweet) {
             return res.status(404).json({ msg: "Tweet not found" })
         }
         //Check user
-        if (post.tweetedBy.toString() !== req.user.id) {
+        if (updatedTweet.tweetedBy.toString() !== req.user.id) {
             return res.status(401).json({ msg: "User not authorized" });
         }
-        await post.save();
-        res.status(200).json(post);
+        await updatedTweet.save();
+        res.status(200).json(updatedTweet);
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error")
     }
 })
 
-// Delete a post
+// Delete a tweet
 router.delete("/:id", auth, async (req, res) => {
     try {
-        const post = await Tweet.findById(req.params.id);
-        //Check post
-        if (!post) {
+        const deletedTweet = await Tweet.findById(req.params.id);
+        //Check tweet
+        if (!deletedTweet) {
             return res.status(404).json({ msg: "Tweet not found" })
         }
         //Check user
-        if (post.tweetedBy.toString() !== req.user.id) {
+        if (deletedTweet.tweetedBy.toString() !== req.user.id) {
             return res.status(401).json({ msg: "User not authorized" });
         }
-        await post.remove();
+        await deletedTweet.remove();
         res.json({ msg: "Tweet removed" });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error")
+    }
+})
+
+// Like a tweet
+router.put("/like/:id", auth, async (req, res) => {
+    try {
+        const tweet = await Tweet.findById(req.params.id);
+        //Check if the tweet has already been liked
+        if (tweet.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+            return res.status(400).json({ msg: "Post already liked" })
+        }
+        tweet.likes.unshift({ user: req.user.id });
+        await tweet.save();
+        console.log("tweet", tweet)
+        res.json(tweet.likes);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error")
+    }
+})
+
+// Unlike a tweet
+router.put("/unlike/:id", auth, async (req, res) => {
+    try {
+        const tweet = await Tweet.findById(req.params.id);
+        //Check if the post has already been liked
+        if (tweet.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
+            return res.status(400).json({ msg: "Post has not yet been liked" })
+        }
+        // Get remove index
+        const removeIndex = tweet.likes.map(like => like.user.toString()).indexOf(req.user.id);
+        tweet.likes.splice(removeIndex, 1);
+        await tweet.save();
+        console.log("tweet", tweet)
+        res.json(tweet.likes);
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error")

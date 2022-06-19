@@ -5,6 +5,7 @@ var token = [];
 var tweetID = [];
 var userList = [];
 var chatList = [];
+var tweetList = [];
 describe('twitter clone test (Jason Xu: jinzxu@ucalgary.ca)', () => {
     // *****Clear all existing registered users and begin user test in Mongodb Databas*****
     it('*****Clear all existing registered users and begin user test in Mongodb Database*****', async () => {
@@ -504,6 +505,47 @@ describe('twitter clone test (Jason Xu: jinzxu@ucalgary.ca)', () => {
             .get(`/tweet`)
             .set('x-auth-token', token[2])
             .expect(200)
+            .expect("Content-type", /json/)
+        tweetList = res.body
+    });
+    // (38) Like tweet test: user2 should be able to like user1's tweet
+    it("(38) Like tweet test: user2 should be able to like user1's tweet", async () => {
+        const res = await request(app)
+            .put(`/tweet/like/${tweetList[0]._id}`)
+            .set('x-auth-token', token[1])
+            .expect(200)
+            .expect("Content-type", /json/)
+    });
+    // (39) Like tweet test: user3 should be able to like user2's tweet
+    it("(39) Like tweet test: user3 should be able to like user2's tweet", async () => {
+        const res = await request(app)
+            .put(`/tweet/like/${tweetList[1]._id}`)
+            .set('x-auth-token', token[2])
+            .expect(200)
+            .expect("Content-type", /json/)
+    });
+    // (40) Like tweet test: user3 should not be able to like user2's tweet if user3 has already liked it
+    it("(40) Like tweet test: user3 should not be able to like user2's tweet if user3 has already liked it", async () => {
+        const res = await request(app)
+            .put(`/tweet/like/${tweetList[1]._id}`)
+            .set('x-auth-token', token[2])
+            .expect(400)
+            .expect("Content-type", /json/)
+    });
+    // (41) Unlike tweet test: user3 should be able to unlike user2's tweet
+    it("(41) Unlike tweet test: user3 should be able to unlike user2's tweet", async () => {
+        const res = await request(app)
+            .put(`/tweet/unlike/${tweetList[1]._id}`)
+            .set('x-auth-token', token[2])
+            .expect(200)
+            .expect("Content-type", /json/)
+    });
+    // (42) Unlike tweet test: user3 should not be able to unlike user2's tweet before user3 likes it
+    it("(42) Unlike tweet test: user3 should not be able to unlike user2's tweet before user3 likes it", async () => {
+        const res = await request(app)
+            .put(`/tweet/unlike/${tweetList[1]._id}`)
+            .set('x-auth-token', token[2])
+            .expect(400)
             .expect("Content-type", /json/)
     });
 });
