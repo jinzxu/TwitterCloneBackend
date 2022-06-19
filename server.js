@@ -7,5 +7,5 @@ app.get("/", (req, res) => res.send("API Running"));
 //Define Routes
 app.use("/register", require("./routes/registerRoutes"));
 app.use("/login", require("./routes/loginRoutes"));
-app.use("/post", require("./routes/postRoutes"));
+app.use("/tweet", require("./routes/tweetRoutes"));
 module.exports = app;

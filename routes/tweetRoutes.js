@@ -3,24 +3,24 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const bodyParser = require("body-parser")
 const User = require('../schemas/UserSchema');
-const Post = require('../schemas/PostSchema');
+const Tweet = require('../schemas/TweetSchema');
 const auth = require("../middleware/auth")
 
-// Delete all posts
+// Delete all tweets
 router.delete("/deleteall", async (req, res) => {
     try {
-        await Post.deleteMany({});
-        res.status(200).send({ message: "All posts are deleted" });
+        await Tweet.deleteMany({});
+        res.status(200).send({ message: "All tweets are deleted" });
     } catch (err) {
         console.log(err.message);
         res.status(500).send(err.message)
     }
 })
-// Read all posts
+// Read all tweets
 router.get("/", auth, async (req, res) => {
     try {
-        const posts = await Post.find().sort({ updatedAt: -1 });
-        res.json(posts);
+        const tweets = await Tweet.find().sort({ updatedAt: -1 });
+        res.json(tweets);
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error")
@@ -37,14 +37,14 @@ router.post("/", [auth,
             return res.status(400).json({ errors: errors.array() });
         }
         const user = await User.findById(req.user.id).select("-password");
-        var postData = {
+        var tweetData = {
             content: req.body.content,
             postedBy: user
         }
-        Post.create(postData)
-            .then(async newPost => {
-                newPost = await User.populate(newPost, { path: "postedBy" })
-                res.status(200).json(newPost);
+        Tweet.create(tweetData)
+            .then(async newTweet => {
+                newTweet = await User.populate(newTweet, { path: "postedBy" })
+                res.status(200).json(newTweet);
             })
     } catch (err) {
         console.error(err.message);
@@ -55,8 +55,16 @@ router.post("/", [auth,
 // Update a post
 router.put("/:id", auth, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id)
+        const post = await Tweet.findById(req.params.id)
         post.content = req.body.content
+        //Check post
+        if (!post) {
+            return res.status(404).json({ msg: "Tweet not found" })
+        }
+        //Check user
+        if (post.postedBy.toString() !== req.user.id) {
+            return res.status(401).json({ msg: "User not authorized" });
+        }
         await post.save();
         res.status(200).json(post);
     } catch (err) {
@@ -68,18 +76,17 @@ router.put("/:id", auth, async (req, res) => {
 // Delete a post
 router.delete("/:id", auth, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
-        console.log(post)
+        const post = await Tweet.findById(req.params.id);
         //Check post
         if (!post) {
-            return res.status(404).json({ msg: "Post not found" })
+            return res.status(404).json({ msg: "Tweet not found" })
         }
         //Check user
         if (post.postedBy.toString() !== req.user.id) {
             return res.status(401).json({ msg: "User not authorized" });
         }
         await post.remove();
-        res.json({ msg: "Post removed" });
+        res.json({ msg: "Tweet removed" });
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error")

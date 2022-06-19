@@ -202,4 +202,5 @@ describe('twitter clone test', () => {
             .expect(400)
             .expect("Content-type", /json/)
     });
+    console.log(token)
 });
