@@ -19,11 +19,11 @@ This project is able to clone twitter backend with the following features:
 
 ## Technial Stack
 
-`Languages`: html/css/javascript
+`Languages` html/css/javascript
 
-`Technologies`: Node.js, Express.js, Mongodb, Jest, Supertest, JWT, bcrypt
+`Technologies` Node.js, Express.js, Mongodb, Jest, Supertest, JWT, bcrypt
 
-`Tools`: VSCODE, git, postman
+`Tools` VSCODE, git, postman
 
 ## Running this project
 
