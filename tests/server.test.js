@@ -609,7 +609,6 @@ describe('twitter clone test (Jason Xu: jinzxu@ucalgary.ca)', () => {
             .expect(200)
             .expect("Content-type", /json/)
         threadList.push(res.body.threads[0])
-        console.log("threadList", threadList)
     });
 
 

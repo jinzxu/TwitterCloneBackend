@@ -5,7 +5,7 @@ const TweetSchema = new Schema({
     content: { type: String, trim: true },
     tweetedBy: { type: Schema.Types.ObjectId },
     retweetedBy: { type: Schema.Types.ObjectId },
-    originTweetId: { type: Schema.Types.ObjectId },
+    originTweetId: { type: Schema.Types.ObjectId, default: null },
     likes: [
         {
             user: {

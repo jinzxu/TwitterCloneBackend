@@ -150,9 +150,6 @@ router.post("/:id/retweet", auth, async (req, res) => {
             tweetedBy: retweetedTweet.tweetedBy,
             retweetedBy: req.user.id,
             originTweetId: req.params.id,
-            likes: retweetedTweet.likes,
-            threads: retweetedTweet.threads,
-            retweets: retweetedTweet.retweets
         }
         Tweet.create(tweetData)
             .then(async newTweet => {
