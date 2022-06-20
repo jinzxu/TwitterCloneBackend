@@ -8,14 +8,14 @@ Jason Xu (Email: jinzxu@ucalgary.ca)
 
 This project is able to clone twitter backend with the following features:
 
-<input type="checkbox" checked> User registration using unique username and a password.<br>
-<input type="checkbox" checked> User login (Including session maintenance using JWT)<br>
-<input type="checkbox" checked> Chat with other users<br>
-<input type="checkbox" checked> Create, read, update, delete tweet<br>
-<input type="checkbox" checked> Like/unlike a tweet<br>
-<input type="checkbox" checked> Retweet<br>
-<input type="checkbox" checked> Threading<br>
-<input type="checkbox" checked> Test<br>
+- [x] User registration using unique username and a password.<br>
+- [x] User login (Including session maintenance using JWT)<br>
+- [x] Chat with other users<br>
+- [x] Create, read, update, delete tweet<br>
+- [x] Like/unlike a tweet<br>
+- [x] Retweet<br>
+- [x] Threading<br>
+- [x] Test<br>
 
 ## Technial Stack
 
@@ -31,4 +31,5 @@ Tools: VSCODE, git
 
 ## Passed Test
 
-Passes tests are as follows:
+54 test have been passed as follows:
+![testPass](https://user-images.githubusercontent.com/104885642/174510423-67b38fc3-67c8-4d73-9df9-fdd1c274371f.png)
