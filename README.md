@@ -33,5 +33,5 @@ This project is able to clone twitter backend with the following features:
 
 ## Passed Test
 
-54 test have been passed as follows:
+54 tests have been passed as follows:
 ![testPass](https://user-images.githubusercontent.com/104885642/174510423-67b38fc3-67c8-4d73-9df9-fdd1c274371f.png)
