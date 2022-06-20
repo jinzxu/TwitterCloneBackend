@@ -29,7 +29,7 @@ This project is able to clone twitter backend with the following features:
 
 ## Technial Stack
 
-`Languages` html/css/javascript
+`Languages` javascript
 
 `Technologies` Node.js, Express.js, Mongodb, Jest, Supertest, JWT, bcrypt
 
