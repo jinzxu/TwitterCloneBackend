@@ -17,6 +17,14 @@ This project is able to clone twitter backend with the following features:
 - [x] Threading<br>
 - [x] Test<br>
 
+## Highlights
+
+⭐️ Developed server-side using Node.js and Express, and performed tests using Jest and Supertest
+⭐️ Implemented JWT authorization as middleware to ensure only authorized users can deal with their data like tweets.
+⭐️ Used MongoDb databse system with Mongoose to manage data including user info, messages and tweets. 
+⭐️ Designed group chat rooms to send/read messages, which is accessible only by users selected by group creator.
+
+
 ## Technial Stack
 
 `Languages` html/css/javascript
