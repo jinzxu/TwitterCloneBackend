@@ -82,7 +82,17 @@ router.delete("/:id", auth, async (req, res) => {
             return res.status(404).json({ msg: "Tweet not found" })
         }
         //Check user
-        if (deletedTweet.tweetedBy.toString() !== req.user.id) {
+        if (deletedTweet.retweetedBy) {
+            if (deletedTweet.retweetedBy.toString() !== req.user.id) {
+                return res.status(401).json({ msg: "User not authorized" });
+            } else {
+                // Remove retweets from original tweet
+                const originTweet = await Tweet.findById(deletedTweet.originTweetId);
+                const removeIndex = originTweet.retweets.map(retweet => retweet.user.toString()).indexOf(req.user.id);
+                originTweet.retweets.splice(removeIndex, 1);
+                await originTweet.save();
+            }
+        } else if (deletedTweet.tweetedBy.toString() !== req.user.id) {
             return res.status(401).json({ msg: "User not authorized" });
         }
         await deletedTweet.remove();
@@ -103,8 +113,7 @@ router.put("/like/:id", auth, async (req, res) => {
         }
         tweet.likes.unshift({ user: req.user.id });
         await tweet.save();
-        console.log("tweet", tweet)
-        res.json(tweet.likes);
+        res.status(200).json(tweet.likes);
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error")
@@ -123,11 +132,84 @@ router.put("/unlike/:id", auth, async (req, res) => {
         const removeIndex = tweet.likes.map(like => like.user.toString()).indexOf(req.user.id);
         tweet.likes.splice(removeIndex, 1);
         await tweet.save();
-        console.log("tweet", tweet)
-        res.json(tweet.likes);
+        res.status(200).json(tweet.likes);
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error")
     }
 })
+
+//Retweet
+router.post("/:id/retweet", auth, async (req, res) => {
+    try {
+        const retweetedTweet = await Tweet.findById(req.params.id);
+        retweetedTweet.retweets.unshift({ user: req.user.id });
+        await retweetedTweet.save();
+        var tweetData = {
+            content: retweetedTweet.content,
+            tweetedBy: retweetedTweet.tweetedBy,
+            retweetedBy: req.user.id,
+            originTweetId: req.params.id,
+            likes: retweetedTweet.likes,
+            threads: retweetedTweet.threads,
+            retweets: retweetedTweet.retweets
+        }
+        Tweet.create(tweetData)
+            .then(async newTweet => {
+                newTweet = await User.populate(newTweet, { path: "tweetedBy" })
+                res.status(200).json(newTweet);
+            })
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error")
+    }
+})
+
+// Create a thread
+router.post("/thread/:id", [auth,
+    check("content", "Content is required").not().isEmpty()
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const tweet = await Tweet.findById(req.params.id);
+        if (tweet.tweetedBy.toString() !== req.user.id) {
+            return res.status(401).json({ msg: "User not authorized" });
+        }
+        const newThread = new Tweet({
+            content: req.body.content,
+            tweetedBy: req.user.id
+        })
+        tweet.threads.unshift(newThread);
+        await tweet.save();
+        res.status(200).json(tweet);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error")
+    }
+});
+
+// Delete a thread
+router.delete("/thread/:id/:thread_id", auth, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const tweet = await Tweet.findById(req.params.id);
+        if (tweet.tweetedBy && tweet.tweetedBy.toString() !== req.user.id) {
+            return res.status(401).json({ msg: "User not authorized" });
+        }
+
+        const removeIndex = tweet.threads.map(thread => thread.user && thread.user.toString()).indexOf(req.user.id);
+        tweet.threads.splice(removeIndex, 1);
+        await tweet.save();
+        res.status(200).json(tweet);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error")
+    }
+});
 module.exports = router;
