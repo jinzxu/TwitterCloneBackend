@@ -23,10 +23,9 @@ This project is able to clone twitter backend with the following features:
 
 ⭐️ Implemented JWT authorization as middleware to ensure only authorized users can deal with their data like tweets.
 
-⭐️ Used MongoDb databse system with Mongoose to manage data including user info, messages and tweets. 
+⭐️ Used MongoDb databse system with Mongoose to manage data including user info, messages and tweets.
 
 ⭐️ Designed group chat rooms to send/read messages, which is accessible only by users selected by group creator.
-
 
 ## Technial Stack
 
@@ -39,7 +38,7 @@ This project is able to clone twitter backend with the following features:
 ## Running this project
 
 1. `npm i` installs dependencies
-2. `npm run server` starts up a hot-reload express webserver on port 7000
+2. `npm run server` starts up a hot-reload express webserver on port 3000
 3. `npm run test` starts up a test
 
 ## Passed Test
